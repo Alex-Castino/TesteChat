@@ -54,11 +54,15 @@ io.on('connection', (socket) => {
     // Verifique se a mensagem recebida não é do próprio bot
     if (!msg.fromMe) {
       // Enviar mensagem para o socket do cliente conectado
-      io.emit('message', {
+      socket.broadcast.emit('message', {
         body: msg.body,
         from: msg.from
       });
+      
     }
+  });
+  client.on('authenticated', () => {
+    console.log('Login realizado com sucesso!');
   });
 
   client.on('auth_failure', () => {
@@ -73,9 +77,29 @@ io.on('connection', (socket) => {
 
 
   // Recebe mensagem do front-end e envia para o contato
-  socket.on('sendMessage', (data) => {
-    const { message, number } = data;
-    client.sendMessage(`${number}@c.us`, message);
+  //socket.on('sendMessage', (data) => {
+  //  console.log(data.msg)
+  //  console.log(data.Destino)
+  //  const { msg, number } = data;
+  //  client.sendMessage(data.Destino, data.msg);
+  //});
+
+  socket.on('sendMessage', async (data) => {
+  
+    try {
+      // Envia a mensagem para o número especificado
+      //await client.sendMessage(data.Destino, data.msg);
+      await client.sendMessage("5511948111546@c.us",data.msg);
+      console.log('OKOKOKOK')
+  
+      // Emite um evento de sucesso para o front-end
+      socket.emit('sendMessageSuccess', 'Mensagem enviada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:\n', error);
+  
+      // Emite um evento de erro para o front-end
+      socket.emit('sendMessageError', 'Erro ao enviar mensagem. Verifique o número e tente novamente.');
+    }
   });
 
   // Recebe contato do front-end e envia a lista de mensagens
