@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WhatsApp Web.js</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="qrcode.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      socket.on('connect', () => {
+        console.log('Socket.io connected!');
+      });
+      socket.on('disconnect', () => {
+        console.log('Socket.io disconnected!');
+      });
+      socket.on('qr', (url) => {
+        console.log('QR code URL received!');
+        document.getElementById('qr-code').src = url;
+      });
+      socket.on('ready', (msg) => {
+        console.log(msg);
+        document.getElementById('qr-status').innerText = msg;
+      });
+      socket.on('authenticated', (msg) => {
+        console.log(msg);
+        document.getElementById('qr-status').innerText = msg;
+      });
+      function connect() {
+        console.log('Connecting to WhatsApp...');
+        socket.emit('connect', 'Connecting to WhatsApp...');
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>WhatsApp Web.js</h1>
+      <button onclick="connect()">Connect</button>
+      <div id="qr-wrapper">
+        <div id="qr-status">Gerando QR code...</div>
+        <img id="qr-code" src="" alt="" />
+      </div>
+    </div>
+ 

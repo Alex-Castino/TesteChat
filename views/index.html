@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>WhatsApp Web Clone</title>
+</head>
+
+<body>
+    <h1>WhatsApp Web Clone</h1>
+    <h2>Scan the QR Code to login</h2>
+    <div id="qrcode"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@latest/dist/qrcode.min.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log('Socket.io connected!');
+        });
+        io.on('connection', (socket) => {
+            console.log(`Socket ${socket.id} connected`);
+
+            // ...
+        });
+
+        socket.on('qr', (qr) => {
+            console.log('QR code received!');
+            new QRCode(document.getElementById('qrcode'), qr);
+        });
+
+        socket.on('ready', (data) => {
+            console.log(data);
+            document.body.innerHTML = '<h1>WhatsApp Web Clone</h1><h2>Logged in</h2>';
+        });
+
+        socket.on('authenticated', (data) => {
+            console.log(data);
+            document.body.innerHTML = '<h1>WhatsApp Web Clone</h1><h2>Authenticated</h2><a href="/chat.html">Go to chat</a>';
+        });
+
+        socket.on('message', (message) => {
+            console.log(message);
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<b>${message.author}:</b> ${message.content}`;
+            document.body.appendChild(messageElement);
+        });
+    </script>
+</body>
+
+</html>
